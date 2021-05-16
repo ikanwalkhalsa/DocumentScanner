@@ -4,9 +4,12 @@ const controls = document.querySelector('.controls');
 const cameraOptions = document.querySelector('.video-options>select');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-const screenshotImage = document.querySelector('img');
+const screenshotImage = document.getElementById('ss');
 const buttons = [...controls.querySelectorAll('button')];
 let streamStarted = false;
+var imgs = new Array();
+var mask = document.getElementById("mask");
+const livefeed = document.getElementById('corners');
 
 const [play, screenshot] = buttons;
 
@@ -53,6 +56,7 @@ play.onclick = () => {
 
 const startStream = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  imgs = new Array();
   handleStream(stream);
 };
 
@@ -65,23 +69,49 @@ const handleStream = (stream) => {
 
 getCameraSelection();
 cameraOptions.onchange = () => {
-    const updatedConstraints = {
-      ...constraints,
-      deviceId: {
-        exact: cameraOptions.value
+  const updatedConstraints = {
+    ...constraints,
+    deviceId: {
+      exact: cameraOptions.value
+    }
+  };
+  startStream(updatedConstraints);
+};
+
+$(function(){
+  window.setInterval(function(){
+    realTimeDocScan()
+  }, 1000/30)
+
+  function realTimeDocScan(){
+    const curr = currentFrame();
+    $.ajax({
+      url:"/livefeed",
+      type:"POST",
+      dataType:"json",
+      data:{frame:curr},
+      success: function(data){
+        livefeed.src=data['data_uri'];
       }
-    };
-    startStream(updatedConstraints);
-  };
-  
-  
-  const doScreenshot = () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    screenshotImage.src = canvas.toDataURL('image/webp');
-    screenshotImage.classList.remove('d-none');
-  };
-  
-  screenshot.onclick = doScreenshot;
- 
+    });
+  }
+});
+
+currentFrame = ()=>{
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  return canvas.toDataURL('image/jpg');
+}
+
+const doScreenshot = () => {
+  screenshotImage.src = currentFrame();
+  imgs.push(screenshotImage.src);
+  screenshotImage.classList.remove('d-none');
+};
+
+screenshot.onclick = doScreenshot;
+screenshotImage.onclick = ()=>{
+  console.log("clicked");
+  console.log(imgs);
+};

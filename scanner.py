@@ -1,5 +1,8 @@
+import io
 import cv2
+import base64
 import numpy as np
+from PIL import Image
 
 def preProcess(img):
     grey_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -43,28 +46,28 @@ def getDocument(img, biggest):
     return wrapped_document
 
 
-def realTimeDocScan(CAM_INDEX):
-    vid = cv2.VideoCapture(CAM_INDEX)
-    while True:
-        _, frame = vid.read()
-        copy = frame.copy()
+def realTimeDocScan(frame):
+    if len(frame)>30:
+        _,frame = frame.split(",",1)
+        frame = base64.b64decode(frame)
+        pimg = Image.open(io.BytesIO(frame))
+        frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_BGR2RGB)
         if frame.shape[0] > 1980 or frame.shape[1] > 1080:
             frame = cv2.resize(frame, (0,0), fx=1920/frame.shape[1], fy=1080/frame.shape[0])
         pre_processed_frame = preProcess(frame)
         biggest_quadilatral = getBiggestQuad(pre_processed_frame, frame)
-        if biggest_quadilatral.shape == (4,1,2):
-            document_frame = getDocument(copy, biggest_quadilatral)
-        _, buffer = cv2.imencode('.jpg', frame)
+        _, buffer = cv2.imencode('.png', frame)
         frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
+        b64frame = base64.b64encode(frame)
+        return b64frame.decode('ascii')
+    return ''
 
         
 
 def scanImage(img_path):
     
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    if img.shape[0] > 1980 or img.shape[1] > 1080:
+    if img.shape[0] > 1920 or img.shape[1] > 1080:
         img = cv2.resize(img, (0,0), fx=1920/img.shape[1], fy=1080/img.shape[0])
     pre_processed_frame = preProcess(img)
     biggest_quadilatral = getBiggestQuad(pre_processed_frame, img.copy())

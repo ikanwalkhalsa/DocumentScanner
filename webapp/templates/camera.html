@@ -4,15 +4,17 @@
 {% block body %}
 <main id = "camera">
     <video autoplay></video>
-    <canvas class="d-none"></canvas>
-
+    <canvas></canvas>
+    <div id = "mask">
+        <img id = "corners" alt = "">
+    </div>
     <div class="video-options">
         <select name="" id="" class="custom-select">
             <option value="">Select camera</option>
         </select>
     </div>
 
-    <img class="screenshot-image d-none" alt="">
+    <img id = "ss" class="screenshot-image d-none" alt="">
 
     <div class="controls">
         <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
@@ -21,6 +23,7 @@
 </main>
 {% endblock %}
 {% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://unpkg.com/feather-icons"></script>
 <script src="/static/camera.js"></script>
 {% endblock %}
