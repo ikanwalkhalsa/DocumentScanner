@@ -2803,3 +2803,4 @@ env/Lib/site-packages/opencv_python_headless-4.5.2.52.dist-info/RECORD
 env/Lib/site-packages/opencv_python_headless-4.5.2.52.dist-info/REQUESTED
 env/Lib/site-packages/opencv_python_headless-4.5.2.52.dist-info/top_level.txt
 env/Lib/site-packages/opencv_python_headless-4.5.2.52.dist-info/WHEEL
+webapp/__pycache__/scanner.cpython-39.pyc

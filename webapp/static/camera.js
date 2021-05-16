@@ -54,7 +54,7 @@ const handleStream = (stream) => {
 $(function(){
   window.setInterval(function(){
     realTimeDocScan()
-  }, 1000/24)
+  }, 1000)
 
   function realTimeDocScan(){
     const curr = currentFrame();

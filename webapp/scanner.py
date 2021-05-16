@@ -54,12 +54,17 @@ def realTimeDocScan(frame):
         frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_BGR2RGB)
         if frame.shape[0] > 1980 or frame.shape[1] > 1080:
             frame = cv2.resize(frame, (0,0), fx=1920/frame.shape[1], fy=1080/frame.shape[0])
+        img = frame.copy()
         pre_processed_frame = preProcess(frame)
         biggest_quadilatral = getBiggestQuad(pre_processed_frame, frame)
-        _, buffer = cv2.imencode('.png', frame)
-        frame = buffer.tobytes()
-        b64frame = base64.b64encode(frame)
-        return b64frame.decode('ascii')
+        if biggest_quadilatral.shape == (4,1,2):
+            frame = getDocument(img, biggest_quadilatral)
+
+        if (type(img==frame) == bool and img != frame) or (type(img==frame) != bool and (img == frame).all()!=True):
+            _, buffer = cv2.imencode('.png', frame)
+            frame = buffer.tobytes()
+            b64frame = base64.b64encode(frame)
+            return f"data:image/png;base64,{b64frame.decode('ascii')}"
     return ''
 
         

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, Response, jsonify, render_template_string, request
-from scanner import realTimeDocScan
+from .scanner import realTimeDocScan
 
 views = Blueprint('views', __name__)
 
@@ -15,4 +15,4 @@ def camera():
 def livefeed():
     frame = request.form['frame']
     src = realTimeDocScan(frame)
-    return jsonify({"data_uri":f"data:image/png;base64,{src}"})
+    return jsonify({"data_uri":src})
