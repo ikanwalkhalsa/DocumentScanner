@@ -1,0 +1,26 @@
+{% extends "base.html" %} 
+{% block style %}<link rel="stylesheet" href="/static/camera.css">{% endblock %}
+{% block title %}Camera{% endblock %}
+{% block body %}
+<main id = "camera">
+    <video autoplay></video>
+    <canvas class="d-none"></canvas>
+
+    <div class="video-options">
+        <select name="" id="" class="custom-select">
+            <option value="">Select camera</option>
+        </select>
+    </div>
+
+    <img class="screenshot-image d-none" alt="">
+
+    <div class="controls">
+        <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
+        <button id="camera--trigger" title="ScreenShot" lass="btn btn-outline-success screenshot d-none">Take a picture</button>
+    </div>
+</main>
+{% endblock %}
+{% block script %}
+<script src="https://unpkg.com/feather-icons"></script>
+<script src="/static/camera.js"></script>
+{% endblock %}
