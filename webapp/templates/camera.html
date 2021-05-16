@@ -3,15 +3,12 @@
 {% block title %}Camera{% endblock %}
 {% block body %}
 <main id = "camera">
+    
     <video autoplay></video>
+
     <canvas></canvas>
     <div id = "mask">
         <img id = "corners" alt = "">
-    </div>
-    <div class="video-options">
-        <select name="" id="" class="custom-select">
-            <option value="">Select camera</option>
-        </select>
     </div>
 
     <img id = "ss" class="screenshot-image d-none" alt="">
@@ -20,6 +17,7 @@
         <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
         <button id="camera--trigger" title="ScreenShot" lass="btn btn-outline-success screenshot d-none">Take a picture</button>
     </div>
+    
 </main>
 {% endblock %}
 {% block script %}

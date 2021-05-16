@@ -1,7 +1,6 @@
 feather.replace();
 
 const controls = document.querySelector('.controls');
-const cameraOptions = document.querySelector('.video-options>select');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const screenshotImage = document.getElementById('ss');
@@ -28,14 +27,6 @@ const constraints = {
   }
 };
 
-const getCameraSelection = async () => {
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  const options = videoDevices.map(videoDevice => {
-    return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
-  });
-  cameraOptions.innerHTML = options.join('');
-};
 
 play.onclick = () => {
   if (streamStarted) {
@@ -43,15 +34,7 @@ play.onclick = () => {
     play.classList.add('d-none');
     return;
   }
-  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    const updatedConstraints = {
-      ...constraints,
-      deviceId: {
-        exact: cameraOptions.value
-      }
-    };
-    startStream(updatedConstraints);
-  }
+  startStream(constraints);
 };
 
 const startStream = async (constraints) => {
@@ -67,21 +50,10 @@ const handleStream = (stream) => {
   streamStarted = true;
 };
 
-getCameraSelection();
-cameraOptions.onchange = () => {
-  const updatedConstraints = {
-    ...constraints,
-    deviceId: {
-      exact: cameraOptions.value
-    }
-  };
-  startStream(updatedConstraints);
-};
-
 $(function(){
   window.setInterval(function(){
     realTimeDocScan()
-  }, 1000/30)
+  }, 1000/24)
 
   function realTimeDocScan(){
     const curr = currentFrame();
