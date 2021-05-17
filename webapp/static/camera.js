@@ -78,7 +78,10 @@ currentFrame = ()=>{
 }
 
 const doScreenshot = () => {
-  screenshotImage.src = currentFrame();
+  if (livefeed.src[0] != 'd')
+    screenshotImage.src = currentFrame();
+  else
+    screenshotImage.src = livefeed.src;
   imgs.push(screenshotImage.src);
   screenshotImage.classList.remove('d-none');
 };
@@ -86,5 +89,4 @@ const doScreenshot = () => {
 screenshot.onclick = doScreenshot;
 screenshotImage.onclick = ()=>{
   console.log("clicked");
-  console.log(imgs);
 };
