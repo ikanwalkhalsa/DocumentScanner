@@ -43,7 +43,8 @@ def getDocument(img, biggest):
     pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     wrapped_document = cv2.warpPerspective(img, matrix, (w, h))
-    return wrapped_document
+    cropped_document = wrapped_document[10 : wrapped_document.shape[0] - 10, 10 : wrapped_document.shape[1] - 10]
+    return cropped_document
 
 
 def processFrame(frame):
@@ -66,22 +67,3 @@ def processFrame(frame):
             b64frame = base64.b64encode(frame)
             return f"data:image/png;base64,{b64frame.decode('ascii')}"
     return ''
-
-        
-
-def scanImage(img_path):
-    
-    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    if img.shape[0] > 1920 or img.shape[1] > 1080:
-        img = cv2.resize(img, (0,0), fx=1920/img.shape[1], fy=1080/img.shape[0])
-    pre_processed_frame = preProcess(img)
-    biggest_quadilatral = getBiggestQuad(pre_processed_frame, img.copy())
-    if biggest_quadilatral.shape == (4,1,2):
-        docuemnt_frame = getDocument(img, biggest_quadilatral)
-        return docuemnt_frame
-    return None
-    
-
-if __name__ == "__main__":
-    cv2.imshow("",realTimeDocScan(1))
-    cv2.waitKey(0)

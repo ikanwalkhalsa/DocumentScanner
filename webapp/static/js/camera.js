@@ -41,7 +41,7 @@ play.onclick = () => {
 
 const startStream = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  imgs = new Array();
+  window.localstream = stream;
   handleStream(stream);
 };
 
@@ -91,12 +91,31 @@ const doScreenshot = () => {
     screenshotImage.src = currentFrame();
   else
     screenshotImage.src = livefeed.src;
-  imgs.push(screenshotImage.src);
+  imgs.push({
+    processed : true,
+    cropCoords : null,
+    croppedImg : null,
+    enhanced : null,
+    src: screenshotImage.src,
+  });
   screenshotImage.classList.remove('d-none');
 };
 
 screenshot.onclick = doScreenshot;
-screenshotImage.onclick = ()=>{
+screenshotImage.onclick = async ()=>{
+  window.localstream.getTracks().forEach(function(track) {
+    if (track.readyState == 'live') {
+        track.stop();
+    }
+  });
   camera = false;
-  window.location.href = 'preview';
+  $.ajax({
+    url:"/preview",
+    type:"POST",
+    dataType:"json",
+    success: function(data){
+      $(mainblock).replaceWith(data);
+      displayImages();
+    }
+  });
 };

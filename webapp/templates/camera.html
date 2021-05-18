@@ -4,12 +4,16 @@
 {% block title %}Camera{% endblock %}
 
 <!------------------CSS--------------------->
-{% block style %}<link rel="stylesheet" href="static/css/camera.css">{% endblock %}
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="static/css/camera.css">
+<link rel="stylesheet" href="static/css/preview.css">
+{% endblock %}
 
 
 <!-------------body-------------->
 {% block body %}
-<main id = "camera">
+<main id = "mainblock",>
     
     <video autoplay></video>
 
@@ -18,7 +22,7 @@
         <img id = "corners" alt = "">
     </div>
 
-    <a id = "next" herf = "{{url_for('views.preview')}}"><img id = "ss" class="screenshot-image d-none" alt=""></a>
+    <img id = "ss" class="screenshot-image d-none" alt="">
 
     <div class="controls">
         <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
@@ -31,4 +35,5 @@
 <!-----------------JavaScript------------------------>
 {% block script %}
 <script src="static/js/camera.js"></script>
+<script src="static/js/preview.js"></script>
 {% endblock %}

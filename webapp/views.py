@@ -18,10 +18,10 @@ def camera():
 
 @views.route('/livefeed', methods = ['POST','GET'])
 def livefeed():
-    frame = [v for _,v in request.form.items()]
+    frame = [v for _,v in request.form.items()][0]
     src = processFrame(frame)
     return jsonify({"data_uri":src})
 
-@views.route('preview', methods = ['GET'])
+@views.route('preview', methods = ['GET','POST'])
 def preview():
-    return render_template("preview.html")
+    return jsonify("",render_template("preview.html"))
