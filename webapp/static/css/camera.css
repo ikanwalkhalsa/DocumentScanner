@@ -52,16 +52,6 @@ video {
     color: white;
 }
 
-@media (min-width: 300px) and (max-width: 400px) {
-    .controls {
-        flex-direction: column;
-    }
-
-    .controls button {
-        margin: 5px 0;
-    }
-}
-
 .controls > button > svg {
     height: 20px;
     width: 18px;

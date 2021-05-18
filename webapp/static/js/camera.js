@@ -1,14 +1,15 @@
-feather.replace();
-
 const controls = document.querySelector('.controls');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const screenshotImage = document.getElementById('ss');
 const buttons = [...controls.querySelectorAll('button')];
-let streamStarted = false;
-var imgs = new Array();
-var mask = document.getElementById("mask");
 const livefeed = document.getElementById('corners');
+var mask = document.getElementById("mask");
+let streamStarted = false;
+let camera = true;
+var imgs = new Array();
+
+
 
 const [play, screenshot] = buttons;
 
@@ -52,18 +53,26 @@ const handleStream = (stream) => {
 };
 
 $(function(){
-  window.setInterval(function(){
-    realTimeDocScan()
+  let feed = window.setInterval(function(){
+    if(camera){
+      if(streamStarted)
+        realTimeDocScan();
+    }
+    else
+      window.clearInterval(feed);
   }, 1000)
 
   function realTimeDocScan(){
-    const curr = currentFrame();
+    curr = currentFrame();
+    const frames = new Array();
+    frames.push(curr);
     $.ajax({
       url:"/livefeed",
       type:"POST",
       dataType:"json",
-      data:{frame:curr},
+      data:{"frame":curr},
       success: function(data){
+        delete frames;
         livefeed.src=data['data_uri'];
       }
     });
@@ -88,5 +97,6 @@ const doScreenshot = () => {
 
 screenshot.onclick = doScreenshot;
 screenshotImage.onclick = ()=>{
-  console.log("clicked");
+  camera = false;
+  window.location.href = 'preview';
 };

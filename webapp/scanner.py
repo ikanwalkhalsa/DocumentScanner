@@ -46,7 +46,7 @@ def getDocument(img, biggest):
     return wrapped_document
 
 
-def realTimeDocScan(frame):
+def processFrame(frame):
     if len(frame)>30:
         _,frame = frame.split(",",1)
         frame = base64.b64decode(frame)

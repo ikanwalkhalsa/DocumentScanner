@@ -1,6 +1,13 @@
+
+<!---------------Extends Base Template--------------------->
 {% extends "base.html" %} 
-{% block style %}<link rel="stylesheet" href="/static/camera.css">{% endblock %}
 {% block title %}Camera{% endblock %}
+
+<!------------------CSS--------------------->
+{% block style %}<link rel="stylesheet" href="static/css/camera.css">{% endblock %}
+
+
+<!-------------body-------------->
 {% block body %}
 <main id = "camera">
     
@@ -11,17 +18,17 @@
         <img id = "corners" alt = "">
     </div>
 
-    <img id = "ss" class="screenshot-image d-none" alt="">
+    <a id = "next" herf = "{{url_for('views.preview')}}"><img id = "ss" class="screenshot-image d-none" alt=""></a>
 
     <div class="controls">
         <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
-        <button id="camera--trigger" title="ScreenShot" lass="btn btn-outline-success screenshot d-none">Take a picture</button>
+        <button id="camera--trigger" title="ScreenShot" class="btn btn-outline-success screenshot d-none">Take a picture</button>
     </div>
     
 </main>
 {% endblock %}
+
+<!-----------------JavaScript------------------------>
 {% block script %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://unpkg.com/feather-icons"></script>
-<script src="/static/camera.js"></script>
+<script src="static/js/camera.js"></script>
 {% endblock %}
