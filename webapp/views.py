@@ -25,3 +25,7 @@ def livefeed():
 @views.route('preview', methods = ['GET','POST'])
 def preview():
     return jsonify("",render_template("preview.html"))
+
+@views.route('spinner', methods = ['GET','POST'])
+def spinner():
+    return redirect(url_for('static', filename = 'imgs/doc.gif'))
