@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, Response, jsonify, redirect, request
 from flask.helpers import url_for
-from .scanner import processFrame
+from .scanner import processFrame, enhanceImg
 
 views = Blueprint('views', __name__)
 
@@ -26,6 +26,13 @@ def livefeed():
 def preview():
     return jsonify("",render_template("preview.html"))
 
-@views.route('spinner', methods = ['GET','POST'])
+@views.route('spinner')
 def spinner():
-    return redirect(url_for('static', filename = 'imgs/doc.gif'))
+    path = request.args['path']
+    return redirect(url_for('static', filename = f'imgs/{path}.gif'))
+
+@views.route('/enhance', methods = ['POST','GET'])
+def enhance():
+    doc = request.form["doc"]
+    enhanced = enhanceImg(doc)
+    return jsonify({"enhanced":enhanced})

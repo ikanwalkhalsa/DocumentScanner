@@ -53,13 +53,13 @@ def processFrame(frame):
         frame = base64.b64decode(frame)
         pimg = Image.open(io.BytesIO(frame))
         frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_BGR2RGB)
-        if frame.shape[0] > 1980 or frame.shape[1] > 1080:
-            frame = cv2.resize(frame, (0,0), fx=1920/frame.shape[1], fy=1080/frame.shape[0])
         img = frame.copy()
         pre_processed_frame = preProcess(frame)
         biggest_quadilatral = getBiggestQuad(pre_processed_frame, frame)
         if biggest_quadilatral.shape == (4,1,2):
             frame = getDocument(img, biggest_quadilatral)
+            if frame.shape[0] > 1980 or frame.shape[1] > 1080:
+                frame = cv2.resize(frame, (0,0), fx=1920/frame.shape[1], fy=1080/frame.shape[0])
 
         if (type(img==frame) == bool and img != frame) or (type(img==frame) != bool and (img == frame).all()!=True):
             _, buffer = cv2.imencode('.png', frame)
@@ -67,3 +67,39 @@ def processFrame(frame):
             b64frame = base64.b64encode(frame)
             return f"data:image/png;base64,{b64frame.decode('ascii')}"
     return ''
+
+def enhanceImg(doc):
+    _,doc = doc.split(",",1)
+    docb64 = base64.b64decode(doc)
+    docimg = Image.open(io.BytesIO(docb64))
+    doc = cv2.cvtColor(np.array(docimg), cv2.COLOR_BGR2RGB)
+    rgb_planes = cv2.split(doc)
+    result_planes = []
+    for plane in rgb_planes:
+        dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
+        bg_img = cv2.medianBlur(dilated_img, 21)
+        diff_img = 255 - cv2.absdiff(plane, bg_img)
+        norm_img = cv2.normalize(diff_img,None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+        result_planes.append(norm_img)
+    enhanced = cv2.merge(result_planes)
+    _,buffer = cv2.imencode('.png',enhanced)
+    datauri = base64.b64encode(buffer)
+    return f"data:image/png;base64,{datauri.decode('ascii')}"
+
+
+if __name__ == "__main__":
+    doc = cv2.imread("D:\\docScanner\\webapp\\static\\imgs\\test2.png")
+    rgb_planes = cv2.split(doc)
+    result_planes = []
+    for plane in rgb_planes:
+        dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
+        bg_img = cv2.medianBlur(dilated_img, 21)
+        diff_img = 255 - cv2.absdiff(plane, bg_img)
+        norm_img = cv2.normalize(diff_img,None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+        result_planes.append(norm_img)
+    enhanced = cv2.merge(result_planes)
+    enhanced = cv2.cvtColor(enhanced, cv2.COLOR_BGR2GRAY)
+    #_,thresh = cv2.threshold(enhanced, 245, 255, cv2.THRESH_TOZERO_INV)
+    thresh = cv2.adaptiveThreshold(enhanced, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 7)
+    cv2.imshow("",thresh)
+    cv2.waitKey(0)

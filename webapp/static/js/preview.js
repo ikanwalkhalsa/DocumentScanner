@@ -11,7 +11,7 @@ const displayImages = ()=>{
             newImgDiv.appendChild(imgSpan);
             let newImg = document.createElement("img");
             imgSpan.appendChild(newImg);
-            newImg.setAttribute("src",img['src']);
+            newImg.setAttribute("src",img[img['src']]);
             newImg.onclick = () => {expandImage(img,index)};
         });
     }
@@ -32,7 +32,7 @@ const expandImage = (img,index) => {
 
     let expandedImg = document.createElement("img");
     expandedWindow.appendChild(expandedImg);
-    expandedImg.setAttribute("src",img["src"]);  
+    expandedImg.setAttribute("src",img[img["src"]]);  
     expandedImg.setAttribute("id","current");  
     curr_index = index;
 
@@ -41,54 +41,20 @@ const expandImage = (img,index) => {
         let imgWidth = $(expandedImg).width();
         let calcImgToEdge = Math.ceil((w - imgWidth) / 2) - 60;
 
-        createButton(
-            expandedWindow,
-            "next", 
-            "changeImg("+index+",1)", 
-            "fa fa-arrow-right", 
-            "top:48vh;right: "+calcImgToEdge+"px;"
-        );
-        createButton(
-            expandedWindow,
-            "prev", 
-            "changeImg("+index+",-1)", 
-            "fa fa-arrow-left", 
-            "top:48vh;left: "+calcImgToEdge+"px;"
-        );
-        createButton(
-            expandedWindow,
-            "close-image", 
-            "closeImg()", 
-            "fa fa-close", 
-            "top:10vh;right: "+calcImgToEdge+"px;"
-        );
-        createButton(
-            expandedWindow,
-            "close-image", 
-            "", 
-            "fa fa-crop", 
-            "top:17vh;right: "+calcImgToEdge+"px;"
-        );
-        createButton(
-            expandedWindow,
-            "close-image", 
-            "", 
-            "fa fa-adjust", 
-            "top:24vh;right: "+calcImgToEdge+"px;"
-        );
-        createButton(
-            expandedWindow,
-            "close-image", 
-            "delImg("+index+")", 
-            "fa fa-trash", 
-            "top:31vh;right: "+calcImgToEdge+"px;"
-        );
+        createButton(expandedWindow,"next","changeImg("+index+",1)","fa fa-arrow-right","top:48vh;right: "+calcImgToEdge+"px;");
+        createButton(expandedWindow,"prev","changeImg("+index+",-1)","fa fa-arrow-left","top:48vh;left: "+calcImgToEdge+"px;");
+        createButton(expandedWindow,"close image","closeImg()","fa fa-close","top:10vh;right: "+calcImgToEdge+"px;");
+        createButton(expandedWindow,"crop","","fa fa-crop","top:17vh;right: "+calcImgToEdge+"px;");
+        createButton(expandedWindow,"enhance","enhanceImg("+index+")","fa fa-adjust","top:24vh;right: "+calcImgToEdge+"px;");
+        createButton(expandedWindow,"delete image","delImg("+index+")","fa fa-trash","top:31vh;right: "+calcImgToEdge+"px;");
     };
 };
 
 const closeImg = () => {
     document.querySelector(".img-window").remove();
     document.querySelectorAll(".img-window .btn").forEach(()=>{this.remove();});
+    document.getElementById("preview-window").innerHTML="";
+    displayImages();
 };
 
 const createButton = (container, name, click, i, css)=>{
@@ -111,7 +77,7 @@ const changeImg = (index, command) => {
     let nextWin = document.querySelector(".img-window");
     let nextImg = document.createElement("img");
     nextWin.appendChild(nextImg);
-    nextImg.setAttribute("src",imgs[newindex]["src"]);  
+    nextImg.setAttribute("src",imgs[newindex][imgs[newindex]["src"]]);  
     nextImg.setAttribute("id","current");
     curr_index=newindex;
 };
@@ -129,12 +95,12 @@ const download =async()=>{
         let aratio = 1;
         if(iw > ih){
             aratio = (iw/ih).toFixed(2);
-            iw = img.naturalWidth > pageWidth ? pageWidth - 20 : img.naturalWidth;
+            iw = pageWidth - 200;
             ih = Math.floor(iw / aratio);
         }
         else{
             aratio = (ih/iw).toFixed(2);
-            ih = img.naturalHeight > pageHeight ? pageHeight - 20 : img.naturalHeight;
+            ih = pageHeight - 200;
             iw = Math.floor(ih / aratio);
         }
         let x = Math.round((pageWidth - iw)/2);
@@ -153,4 +119,35 @@ const delImg = (index) => {
     document.getElementById("preview-window").innerHTML="";
     imgs.splice(index, 1);
     displayImages();
+}
+
+const enhanceImg = (index) => {
+    let enhanceBtn = document.querySelector("#enhance")
+    let img = document.querySelector("#current")
+    if(imgs[index]['src'] == "enhanced"){
+        img.src = imgs[index]['original'];
+        imgs[index]['src'] = 'original';
+        enhanceBtn.tite = "enhance";
+    }
+    else{
+        if(imgs[index]['enhanced']){
+            img.src = imgs[index]['enhanced'];
+            imgs[index]['src'] = 'enhanced';
+        }
+        else{
+            $.ajax({
+                url:'enhance',
+                type:'post',
+                dataType:"json",
+                data:{"doc":img.src},
+                success:(data)=>{
+                    img.src=data['enhanced'];
+                    imgs[index]['enhanced'] = data['enhanced'];
+                    imgs[index]['src'] = 'enhanced';
+                    console.log("success")
+                }
+            });
+        }
+        enhanceBtn.title = "original";
+    }
 }

@@ -60,7 +60,7 @@ $(function(){
     }
     else
       window.clearInterval(feed);
-  }, 1000)
+  }, 1000/2)
 
   function realTimeDocScan(){
     curr = currentFrame();
@@ -92,11 +92,11 @@ const doScreenshot = () => {
   else
     screenshotImage.src = livefeed.src;
   imgs.push({
-    processed : true,
     cropCoords : null,
     croppedImg : null,
     enhanced : null,
-    src: screenshotImage.src,
+    original : screenshotImage.src,
+    src: 'original',
   });
   screenshotImage.classList.remove('d-none');
 };
