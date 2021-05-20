@@ -1,34 +1,40 @@
-
 <!---------------Extends Base Template--------------------->
-{% extends "base.html" %} 
-{% block title %}Camera{% endblock %}
+{% extends "base.html" %} {% block title %}Camera{% endblock %}
 
 <!------------------CSS--------------------->
 {% block style %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="static/css/camera.css">
-<link rel="stylesheet" href="static/css/preview.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<link rel="stylesheet" href="static/css/camera.css" />
+<link rel="stylesheet" href="static/css/preview.css" />
 {% endblock %}
-
 
 <!-------------body-------------->
 {% block body %}
-<main id = "mainblock",>
-    
-    <video autoplay></video>
+<main id="mainblock" ,>
+  <video autoplay></video>
 
-    <canvas class = "d-none"></canvas>
-    <div id = "mask">
-        <img id = "corners" alt = "">
-    </div>
+  <canvas class="d-none"></canvas>
+  <div id="mask">
+    <img id="corners" alt="" />
+  </div>
 
-    <img id = "ss" class="screenshot-image d-none" alt="">
+  <img id="ss" class="screenshot-image d-none" alt="" />
 
-    <div class="controls">
-        <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
-        <button id="camera--trigger" title="ScreenShot" class="btn btn-outline-success screenshot d-none">Take a picture</button>
-    </div>
-    
+  <div class="controls">
+    <button class="btn btn-danger play" title="Play">
+      <i data-feather="play-circle"></i>
+    </button>
+    <button
+      id="camera--trigger"
+      title="ScreenShot"
+      class="btn btn-outline-success screenshot d-none"
+    >
+      Take a picture
+    </button>
+  </div>
 </main>
 {% endblock %}
 
