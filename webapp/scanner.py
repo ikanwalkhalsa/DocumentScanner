@@ -86,10 +86,44 @@ def enhanceImg(doc):
     datauri = base64.b64encode(buffer)
     return f"data:image/png;base64,{datauri.decode('ascii')}"
 
+def cropImg(biggest, frame):
+    _,frame = frame.split(",",1)
+    frame = base64.b64decode(frame)
+    pimg = Image.open(io.BytesIO(frame))
+    frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_BGR2RGB)
+    biggest = np.array(biggest)
+    sorted_points = np.zeros((4, 1, 2), np.int32)
+    add = biggest.sum(1)
+    sorted_points[0] = biggest[np.argmin(add)]
+    sorted_points[3] = biggest[np.argmax(add)]
+    diff = np.diff(biggest, axis = 1)
+    sorted_points[1] = biggest[np.argmin(diff)]
+    sorted_points[2] = biggest[np.argmax(diff)]
+    pts1 = np.float32(sorted_points)
+    h = max(sorted_points[2][0][0], sorted_points[1][0][0])
+    w = max(sorted_points[2][0][1], sorted_points[1][0][1])
+    pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+    matrix = cv2.getPerspectiveTransform(pts1, pts2)
+    frame = cv2.warpPerspective(frame, matrix, (w, h))
+    _, buffer = cv2.imencode('.png', frame)
+    frame = buffer.tobytes()
+    b64frame = base64.b64encode(frame)
+    return f"data:image/png;base64,{b64frame.decode('ascii')}"
+
+
 
 if __name__ == "__main__":
-    doc = cv2.imread("D:\\docScanner\\webapp\\static\\imgs\\test2.png")
-    rgb_planes = cv2.split(doc)
+    frame = cv2.imread("D:\\docScanner\\webapp\\static\\imgs\\demo_img1.jpg")
+    img = frame.copy()
+    pre_processed_frame = preProcess(frame)
+    biggest_quadilatral = getBiggestQuad(pre_processed_frame, frame)
+    if biggest_quadilatral.shape == (4,1,2):
+        frame = getDocument(img, biggest_quadilatral)
+        if frame.shape[0] > 1980 or frame.shape[1] > 1080:
+            frame = cv2.resize(frame, (0,0), fx=1920/frame.shape[1], fy=1080/frame.shape[0])
+    cv2.imshow("",frame)
+    cv2.waitKey(0)
+""" rgb_planes = cv2.split(doc)
     result_planes = []
     for plane in rgb_planes:
         dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
@@ -99,7 +133,5 @@ if __name__ == "__main__":
         result_planes.append(norm_img)
     enhanced = cv2.merge(result_planes)
     enhanced = cv2.cvtColor(enhanced, cv2.COLOR_BGR2GRAY)
-    #_,thresh = cv2.threshold(enhanced, 245, 255, cv2.THRESH_TOZERO_INV)
-    thresh = cv2.adaptiveThreshold(enhanced, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 7)
-    cv2.imshow("",thresh)
-    cv2.waitKey(0)
+    thresh = cv2.adaptiveThreshold(enhanced, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 7) """
+    

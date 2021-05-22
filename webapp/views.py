@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, Response, jsonify, redirect, request
 from flask.helpers import url_for
-from .scanner import processFrame, enhanceImg
+from .scanner import processFrame, enhanceImg, cropImg
 
 views = Blueprint('views', __name__)
 
@@ -36,3 +36,13 @@ def enhance():
     doc = request.form["doc"]
     enhanced = enhanceImg(doc)
     return jsonify({"enhanced":enhanced})
+
+@views.route('/crop', methods = ['POST','GET'])
+def crop():
+    p1 = [int(x) for x in list(request.form.getlist('croppts[0][]'))]
+    p2 = [int(x) for x in list(request.form.getlist('croppts[1][]'))]
+    p3 = [int(x) for x in list(request.form.getlist('croppts[2][]'))]
+    p4 = [int(x) for x in list(request.form.getlist('croppts[3][]'))]
+    img = request.form['src']
+    src = cropImg([p1,p2,p3,p4],img)
+    return jsonify({"data_uri":src})

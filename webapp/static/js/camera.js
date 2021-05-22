@@ -93,7 +93,7 @@ const doScreenshot = () => {
     screenshotImage.src = livefeed.src;
   imgs.push({
     cropCoords : null,
-    croppedImg : null,
+    cropped : null,
     enhanced : null,
     original : screenshotImage.src,
     src: 'original',

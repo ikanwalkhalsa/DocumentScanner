@@ -1,4 +1,5 @@
 var curr_index = 0;
+var points = ["0px 0px", "100% 0px", "100% 100%", "0px 100%"];
 
 const displayImages = () => {
   let view = document.getElementById("preview-window");
@@ -70,7 +71,7 @@ const expandImage = (img, index) => {
     createButton(
       expandedWindow,
       "crop",
-      "",
+      "cropImg()",
       "fa fa-crop",
       "top:17vh;right: " + calcImgToEdge + "px;"
     );
@@ -209,3 +210,280 @@ const enhanceImg = (index) => {
   enhanceBtn.blur();
   processing.style.display="none";
 };
+
+const cropImg = () =>{
+
+  
+
+  document.querySelectorAll(".img-window .btn").forEach((btn)=>{
+    btn.style.display = "none";
+  });
+  
+  let extendedWindow = document.querySelector(".img-window");
+  createButton(
+    extendedWindow,
+    "exit",
+    "exitCrop()",
+    "fa fa-close",
+    "top:1.5vh;left:43vw;"
+  );
+  createButton(
+    extendedWindow,
+    "done",
+    "crop()",
+    "fa fa-check",
+    "top:1.5vh;left:50vw;"
+  );
+
+  let mask = document.createElement("div");
+  mask.setAttribute("id","cropper");
+  extendedWindow.appendChild(mask);
+  img = document.querySelector("#current");
+  img.src = imgs[curr_index]['original'];
+  
+  
+  img.onload = () => {
+    
+    mask.style.width = img.width+"px";
+    mask.style.height = img.height+"px";
+    mask.style.top = img.offsetTop+"px";
+    mask.style.left = img.offsetLeft+"px";
+
+    let topleft = document.createElement("div");
+    mask.appendChild(topleft);
+    topleft.setAttribute("id", "tl");
+    topleft.setAttribute("class", "point");
+    topleft.style.top = 0;
+    topleft.style.left = 0;
+    topleft.onmousedown = tlmove;
+
+    let topright = document.createElement("div");
+    mask.appendChild(topright);
+    topright.setAttribute("id", "tr");
+    topright.setAttribute("class", "point");
+    topright.style.top = 0;
+    topright.style.left = "" + img.width - topright.offsetWidth + "px";
+    topright.onmousedown = trmove;
+
+    let bottomleft = document.createElement("div");
+    mask.appendChild(bottomleft);
+    bottomleft.setAttribute("id", "bl");
+    bottomleft.setAttribute("class", "point");
+    bottomleft.style.top = "" + img.height - bottomleft.offsetHeight + "px";
+    bottomleft.style.left = 0;
+    bottomleft.onmousedown = blmove;
+
+    let bottomright = document.createElement("div");
+    mask.appendChild(bottomright);
+    bottomright.setAttribute("id", "br");
+    bottomright.setAttribute("class", "point");
+    bottomright.style.top =
+      "" + img.height - bottomright.offsetHeight + "px";
+    bottomright.style.left = "" + img.width - bottomright.offsetWidth + "px";
+    bottomright.onmousedown = brmove;
+
+    if(imgs[curr_index]['cropcoords']){
+      let tl = document.querySelector("#tl");
+      let tr = document.querySelector("#tr");
+      let bl = document.querySelector("#bl");
+      let br = document.querySelector("#br");
+      points = imgs[curr_index]['cropcoords'];
+      mask.style.webkitClipPath ="polygon(" +points[0] +"," +points[1] +"," +points[2] +"," +points[3] +")";
+      tl.style.left = points[0].split(" ")[0]
+      tl.style.top = points[0].split(" ")[1]
+      tr.style.left = points[1].split(" ")[0]
+      tr.style.top = points[1].split(" ")[1]
+      br.style.left = points[2].split(" ")[0]
+      br.style.top = points[2].split(" ")[1]
+      bl.style.left = points[3].split(" ")[0]
+      bl.style.top = points[3].split(" ")[1]
+    }
+  }
+
+  function move(x,y, point, cr) {
+        let top =
+          y -
+          (window.innerHeight - cr.offsetHeight) / 2 -
+          point.offsetHeight / 2;
+        let left =
+          x -
+          (window.innerWidth - cr.offsetWidth) / 2 -
+          point.offsetWidth / 2;
+        if (top < 0) top = 0;
+        if (top > cr.offsetHeight - point.offsetHeight)
+          top = cr.offsetHeight - point.offsetHeight;
+        if (left < 0) left = 0;
+        if (left > cr.offsetWidth - point.offsetWidth)
+          left = cr.offsetWidth - point.offsetWidth;
+        point.style.top = "" + top + "px";
+        point.style.left = "" + left + "px";
+        return [left, top];
+      }
+
+      function tlmove(e) {
+        var tl = document.querySelector("#tl");
+        var cr = document.querySelector("#cropper");
+        let moveEvent = (e) => {
+          point = move(e.clientX,e.clientY, tl, cr);
+          points[0] = "" + point[0] + "px " + point[1] + "px";
+          cr.style.webkitClipPath =
+            "polygon(" +
+            points[0] +
+            "," +
+            points[1] +
+            "," +
+            points[2] +
+            "," +
+            points[3] +
+            ")";
+        };
+        moveEvent(e);
+        document.addEventListener("mousemove", moveEvent);
+        tl.onmouseup = function () {
+          document.removeEventListener("mousemove", moveEvent);
+          tl.onmouseup = null;
+        };
+        tl.ondragstart = function () {
+          return false;
+        };
+      }
+
+      function trmove(e) {
+        var tr = document.querySelector("#tr");
+        var cr = document.querySelector("#cropper");
+        let moveEvent = (e) => {
+          point = move(e.clientX,e.clientY, tr, cr);
+          points[1] =
+            "" + (point[0] + tr.offsetWidth) + "px " + point[1] + "px";
+          cr.style.webkitClipPath =
+            "polygon(" +
+            points[0] +
+            "," +
+            points[1] +
+            "," +
+            points[2] +
+            "," +
+            points[3] +
+            ")";
+        };
+        moveEvent(e);
+        document.addEventListener("mousemove", moveEvent);
+        tr.onmouseup = function () {
+          document.removeEventListener("mousemove", moveEvent);
+          tr.onmouseup = null;
+        };
+        tr.ondragstart = function () {
+          return false;
+        };
+      }
+
+      function blmove(e) {
+        var bl = document.querySelector("#bl");
+        var cr = document.querySelector("#cropper");
+        let moveEvent = (e) => {
+          point = move(e.clientX,e.clientY, bl, cr);
+          points[3] =
+            "" + point[0] + "px " + (point[1] + bl.offsetHeight) + "px";
+          cr.style.webkitClipPath =
+            "polygon(" +
+            points[0] +
+            "," +
+            points[1] +
+            "," +
+            points[2] +
+            "," +
+            points[3] +
+            ")";
+        };
+        moveEvent(e);
+        document.addEventListener("mousemove", moveEvent);
+        bl.onmouseup = function () {
+          document.removeEventListener("mousemove", moveEvent);
+          bl.onmouseup = null;
+        };
+        bl.ondragstart = function () {
+          return false;
+        };
+      }
+
+      function brmove(e) {
+        var br = document.querySelector("#br");
+        var cr = document.querySelector("#cropper");
+        let moveEvent = (e) => {
+          point = move(e.clientX,e.clientY, br, cr);
+          points[2] =
+            "" +
+            (point[0] + bl.offsetWidth) +
+            "px " +
+            (point[1] + bl.offsetHeight) +
+            "px";
+          cr.style.webkitClipPath =
+            "polygon(" +
+            points[0] +
+            "," +
+            points[1] +
+            "," +
+            points[2] +
+            "," +
+            points[3] +
+            ")";
+        };
+        moveEvent(e);
+        document.addEventListener("mousemove", moveEvent);
+        br.onmouseup = function () {
+          document.removeEventListener("mousemove", moveEvent);
+          br.onmouseup = null;
+        };
+        br.ondragstart = function () {
+          return false;
+        };
+      }
+}
+
+const exitCrop = ()=>{
+  document.querySelector("#current").src=imgs[curr_index][imgs[curr_index]['src']]
+  document.querySelector("#exit").remove();
+  document.querySelector("#done").remove();
+  document.querySelector("#cropper").remove();
+  document.querySelectorAll(".img-window .btn").forEach((btn)=>{
+      btn.style.display = "block";
+  });
+}
+
+const crop = ()=>{
+  let img = document.querySelector("#current")
+  let imnw = img.naturalWidth;
+  let imnh = img.naturalHeight;
+  let imw = img.width;
+  let imh = img.height;
+  imgs[curr_index]['cropcoords'] = points;
+  let coords = []
+  points.forEach((pt)=>{
+    pt1=[]
+    xy = pt.split(" ");
+    pt1[0] = Math.round(xy[0].includes("px")?imnw * (xy[0].slice(0,-2)/imw):imnw*(xy[0].slice(0,-1)/100));
+    pt1[1] = Math.round(xy[1].includes("px")?imnh * (xy[1].slice(0,-2)/imh):imnh*(xy[1].slice(0,-1)/100));
+    coords.push(pt1);
+  });
+  $.ajax({
+    type:"POST",
+    url:"crop",
+    dataType:"json",
+    data:{croppts:coords,src:imgs[curr_index]['original']},
+    success:function(data){
+      img.src=data['data_uri'];
+      imgs[curr_index]['cropped'] = img.src;
+      imgs[curr_index]['src']='cropped';
+      exitCrop();
+      img.onload = () => {
+        let calcImgToEdge = Math.ceil((window.innerWidth - img.width) / 2) - 60;
+        document.querySelector("#prev").style.cssText = "top:48vh;left: " + calcImgToEdge + "px;";
+        document.querySelector("#next").style.cssText = "top:48vh;right: " + calcImgToEdge + "px;";
+        document.querySelector("#close").style.cssText = "top:10vh;right: " + calcImgToEdge + "px;";
+        document.querySelector("#enhance").style.cssText = "top:24vh;right: " + calcImgToEdge + "px;";
+        document.querySelector("#crop").style.cssText = "top:17vh;right: " + calcImgToEdge + "px;";
+        document.querySelector("#delete").style.cssText = "top:31vh;right: " + calcImgToEdge + "px;";
+      }
+    }
+  });
+}
