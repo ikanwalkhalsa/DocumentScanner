@@ -109,12 +109,15 @@ screenshotImage.onclick = async ()=>{
     }
   });
   camera = false;
+  let loader = document.querySelector(".loading");
+  loader.style.display="block";
   $.ajax({
     url:"/preview",
     type:"POST",
     dataType:"json",
     success: function(data){
       $(mainblock).replaceWith(data);
+      loader.style.display="none";
       displayImages();
     }
   });

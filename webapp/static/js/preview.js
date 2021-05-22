@@ -37,6 +37,10 @@ const expandImage = (img, index) => {
   expandedImg.setAttribute("id", "current");
   curr_index = index;
 
+  let loader = document.createElement("div");
+  loader.setAttribute("class","processing");
+  expandedWindow.appendChild(loader);
+
   expandedImg.onload = () => {
     const w = window.innerWidth;
     let imgWidth = $(expandedImg).width();
@@ -131,7 +135,7 @@ const changeImg = (index, command) => {
 };
 
 const download = async () => {
-  let loader = document.querySelector("#loading");
+  let loader = document.querySelector(".loading");
   loader.style.display = "block";
   let fileName = document.querySelector(".fileinfo input[type=text]");
   let doc = new jsPDF("p", "px", [2480, 3508], true);
@@ -171,8 +175,14 @@ const delImg = (index) => {
 };
 
 const enhanceImg = (index) => {
+  let processing = document.querySelector(".processing");
   let enhanceBtn = document.querySelector("#enhance");
   let img = document.querySelector("#current");
+  processing.style.top = img.offsetTop+"px";
+  processing.style.left = img.offsetLeft+"px";
+  processing.style.width = img.offsetWidth+"px";
+  processing.style.height = img.offsetHeight+"px";
+  processing.style.display = "flex";
   if (imgs[curr_index]["src"] == "enhanced") {
     img.src = imgs[curr_index]["original"];
     imgs[curr_index]["src"] = "original";
@@ -197,4 +207,5 @@ const enhanceImg = (index) => {
     enhanceBtn.title = "original";
   }
   enhanceBtn.blur();
+  processing.style.display="none";
 };
