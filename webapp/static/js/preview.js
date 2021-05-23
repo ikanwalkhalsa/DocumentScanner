@@ -185,9 +185,16 @@ const enhanceImg = (index) => {
   processing.style.height = img.offsetHeight+"px";
   processing.style.display = "flex";
   if (imgs[curr_index]["src"] == "enhanced") {
-    img.src = imgs[curr_index]["original"];
-    imgs[curr_index]["src"] = "original";
-    enhanceBtn.tite = "enhance";
+    if(imgs[curr_index]['cropped']){
+      img.src = imgs[curr_index]["cropped"];
+      imgs[curr_index]["src"] = "cropped";
+      enhanceBtn.tite = "enhance";
+    }
+    else{
+      img.src = imgs[curr_index]["original"];
+      imgs[curr_index]["src"] = "original";
+      enhanceBtn.tite = "enhance";
+    }
   } else {
     if (imgs[curr_index]["enhanced"]) {
       img.src = imgs[curr_index]["enhanced"];
@@ -289,14 +296,23 @@ const cropImg = () =>{
       let br = document.querySelector("#br");
       points = imgs[curr_index]['cropcoords'];
       mask.style.webkitClipPath ="polygon(" +points[0] +"," +points[1] +"," +points[2] +"," +points[3] +")";
-      tl.style.left = points[0].split(" ")[0]
-      tl.style.top = points[0].split(" ")[1]
-      tr.style.left = points[1].split(" ")[0]
-      tr.style.top = points[1].split(" ")[1]
-      br.style.left = points[2].split(" ")[0]
-      br.style.top = points[2].split(" ")[1]
-      bl.style.left = points[3].split(" ")[0]
-      bl.style.top = points[3].split(" ")[1]
+      let coords = []
+      points.forEach((pt)=>{
+        pt1=[]
+        xy = pt.split(" ");
+        pt1[0] = Math.round(xy[0].includes("px")?xy[0].slice(0,-2):img.width*(xy[0].slice(0,-1)/100));
+        pt1[1] = Math.round(xy[1].includes("px")?xy[1].slice(0,-2):img.height*(xy[1].slice(0,-1)/100));
+        coords.push(pt1);
+      });
+
+      tl.style.left = coords[0][0]+"px";
+      tl.style.top = coords[0][1]+"px";
+      tr.style.left = (coords[1][0] - tr.offsetWidth)+"px";
+      tr.style.top = coords[1][1]+"px";
+      br.style.left = (coords[2][0] - br.offsetWidth)+"px";
+      br.style.top = (coords[2][1] - br.offsetHeight)+"px";
+      bl.style.left = coords[3][0]+"px";
+      bl.style.top = (coords[3][1] - br.offsetHeight)+"px";
     }
   }
 
@@ -451,7 +467,13 @@ const exitCrop = ()=>{
 }
 
 const crop = ()=>{
-  let img = document.querySelector("#current")
+  let processing = document.querySelector(".processing");
+  let img = document.querySelector("#current");
+  processing.style.top = img.offsetTop+"px";
+  processing.style.left = img.offsetLeft+"px";
+  processing.style.width = img.offsetWidth+"px";
+  processing.style.height = img.offsetHeight+"px";
+  processing.style.display = "flex";
   let imnw = img.naturalWidth;
   let imnh = img.naturalHeight;
   let imw = img.width;
@@ -474,6 +496,7 @@ const crop = ()=>{
       img.src=data['data_uri'];
       imgs[curr_index]['cropped'] = img.src;
       imgs[curr_index]['src']='cropped';
+      imgs[curr_index]['enhanced']=null;
       exitCrop();
       img.onload = () => {
         let calcImgToEdge = Math.ceil((window.innerWidth - img.width) / 2) - 60;
@@ -486,4 +509,5 @@ const crop = ()=>{
       }
     }
   });
+  processing.style.display = "none";
 }
